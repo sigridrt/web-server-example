@@ -14,6 +14,8 @@
 #include <iostream>
 #include <sstream>
 
+using namespace std; 
+
 namespace SimpleWeb {
     template <class socket_type>
     class ServerBase {
@@ -357,8 +359,16 @@ namespace SimpleWeb {
                     if(!ec) {
                         if(timeout_content>0)
                             timer->cancel();
-                        auto http_version=stof(request->http_version);
                         
+                        auto http_version=1.1;
+                        
+                        try{
+                        http_version=stof(request->http_version);
+                    }catch(const exception &e){
+                        if(exception_handler)
+                            exception_handler(e);
+                        return;
+                    }
                         auto range=request->header.equal_range("Connection");
                         for(auto it=range.first;it!=range.second;it++) {
                             if(boost::iequals(it->second, "close"))
